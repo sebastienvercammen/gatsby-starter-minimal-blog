@@ -4,7 +4,7 @@ require(`dotenv`).config({
 
 module.exports = {
   siteMetadata: {
-    siteTitleAlt: `Minimal Blog - Gatsby Theme`,
+    siteTitleAlt: `Sébastien Vercammen`,
   },
   plugins: [
     {
@@ -23,21 +23,21 @@ module.exports = {
         externalLinks: [
           {
             name: `Twitter`,
-            url: `https://twitter.com/lekoarts_de`,
+            url: `https://twitter.com/sebvercammen`,
           },
           {
-            name: `Instagram`,
-            url: `https://www.instagram.com/lekoarts.de/`,
+            name: `GitHub`,
+            url: `https://github.com/sebastienvercammen/`,
           },
         ],
       },
     },
-    {
+    /*{
       resolve: `gatsby-plugin-google-analytics`,
       options: {
         trackingId: process.env.GOOGLE_ANALYTICS_ID,
       },
-    },
+    },*/
     `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-manifest`,
