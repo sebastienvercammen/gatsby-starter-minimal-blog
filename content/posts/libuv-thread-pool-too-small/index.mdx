@@ -1,0 +1,92 @@
+---
+title: "Your libuv Thread Pool Size Is Too Small"
+date: 2020-02-13
+slug: "/libuv-thread-pool-too-small"
+tags:
+  - Node.js
+  - Practical Advice
+  - Performance
+---
+
+A short article about Node.js, [libuv](https://github.com/libuv/libuv), how your application might be bottlenecked by libuv, and how to fix it.
+
+## Potential Impact
+
+For I/O-heavy applications that rely on libuv, the libuv thread pool size may become a critical bottleneck and one of the most impactful factors to increase total throughput.
+
+## "What's a libuv?"
+
+![libuv](./libuv.png)
+
+[libuv](https://github.com/libuv/libuv) is a multi-platform library for asynchronous I/O.
+
+## Must-Know about libuv?
+
+* Some of Node.js' I/O methods rely on libuv.
+    * Where possible, Node.js uses APIs that are already asynchronous/non-blocking.
+    * In the other cases, libuv uses a thread pool to turn sync/blocking I/O into async/non-blocking.
+* libuv's thread pool size is only `4` by default.
+
+## What's the Problem?
+
+In as few words as possible: libuv's default thread pool size is only `4`.
+
+Do anything more than 4 concurrent I/O operations that rely on libuv, and libuv's small thread pool size becomes a bottleneck, as each extra operation has to wait in queue.
+
+Some I/O operations that use libuv's thread pool:
+
+* All file system operations
+* DNS resolution
+* Lib & user code that calls uv_queue_work
+
+## Solving It
+
+To solve it, increase the environment variable `UV_THREADPOOL_SIZE` **before** you do any I/O calls. Ideally, change it before starting Node.js.
+
+libuv instantiates the thread pool when you first call an I/O method that relies on the thread pool. Once instantiated, changes to the thread pool size (`UV_THREADPOOL_SIZE`) will have no effect.
+
+### Examples
+
+It's recommended to change `UV_THREADPOOL_SIZE` before starting Node.js.
+
+Your intentions are clearer if you set environment variables before launching Node.js, and it's less likely that something will go wrong _(e.g. an included library calls I/O as a side effect)_.
+
+**Via Bash:**
+```bash
+UV_THREADPOOL_SIZE=64 node index.js
+```
+
+**Via Windows CLI:**
+```bat
+SET UV_THREADPOOL_SIZE=64 && node index.js
+```
+
+**As first instruction in your Node.js app:** _(not recommended)_
+```js
+'use strict'
+process.env.UV_THREADPOOL_SIZE=64;
+```
+
+## How High Should I Set It?
+
+Depends on a case-by-case basis.
+
+* The thread pool size is the exact amount of **maximum** concurrent I/O tasks.
+* Setting it a little too high has less impact on your throughput than setting it too low.
+* Setting it extremely high is unnecessary.
+* Memory overhead is ~1MB for 128 threads.
+* The maximum (since 1.30.0) is `1024`.
+* Setting it to the number of CPU cores is not a good standard. These are I/O, not CPU-intensive, operations.
+
+You can count threads in use by `node` on Linux with:
+
+```bash
+ps -Lef | grep  "\<node\>" | wc -l
+```
+
+## Reading Material
+
+* [libuv Design Overview](http://docs.libuv.org/en/latest/design.html)
+* [libuv API: Thread pool work scheduling](http://docs.libuv.org/en/v1.x/threadpool.html)
+* [On problems with threads in Node.js](https://www.future-processing.pl/blog/on-problems-with-threads-in-node-js/)
+* [StackOverflow: "Has anyone tried using the UV_THREADPOOL_SIZE environment variable?"](https://stackoverflow.com/questions/17554688/has-anyone-tried-using-the-uv-threadpool-size-environment-variable)

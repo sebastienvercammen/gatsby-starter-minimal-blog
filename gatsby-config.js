@@ -13,6 +13,10 @@ module.exports = {
       options: {
         navigation: [
           {
+            title: `Home`,
+            slug: `/`
+          },
+          {
             title: `Blog`,
             slug: `/blog`,
           },
@@ -23,6 +27,10 @@ module.exports = {
         ],
         externalLinks: [
           {
+            name: `LinkedIn`,
+            url: `https://www.linkedin.com/in/sebastienvercammen/`
+          },
+          {
             name: `Twitter`,
             url: `https://twitter.com/sebvercammen`,
           },
@@ -30,6 +38,10 @@ module.exports = {
             name: `GitHub`,
             url: `https://github.com/sebastienvercammen/`,
           },
+          {
+            name: `StackOverflow`,
+            url: `https://stackoverflow.com/users/5996785/s%c3%a9bastien-vercammen`
+          }
         ],
       },
     },
